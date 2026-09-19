@@ -55,6 +55,23 @@ static std::string folder_dialog(HWND owner, const std::string &initial) {
 }
 static bool search_match(const std::string &query,const J &row) {return SearchQuery(query).match(row);}
 
+static std::string read_game_directory(const fs::path &ini) {
+    wchar_t value[32768]{};
+    GetPrivateProfileStringW(L"CODM", L"Directory", L"", value, DWORD(std::size(value)), fs::absolute(ini).c_str());
+    return pathstr(fs::path(value));
+}
+static void save_game_directory(const fs::path &ini, const std::string &directory) {
+    if (!fs::exists(ini)) {
+        std::ofstream file(ini, std::ios::binary);
+        file.write("\xff\xfe", 2); file.close();
+        require(bool(file), "Could not create settings.ini.");
+    }
+    require(WritePrivateProfileStringW(L"CODM", L"Directory", pathof(directory).c_str(), fs::absolute(ini).c_str()) != 0,
+            "Could not save settings.ini. Choose a writable application folder.");
+}
+static std::string directory_key(const std::string &directory) {
+    return lower(pathstr(fs::weakly_canonical(pathof(directory))));
+}
 struct Studio {
     // Optional observation for the hidden input regression. It never activates
     // widgets or alters their behavior; input still travels through ImGuiIO.
@@ -66,12 +83,14 @@ struct Studio {
     GLFWwindow *window = nullptr;
     double renderMilliseconds=0;
     PreviewPoseCache poseCache;
-    fs::path root, data, catalog, database, settings;
+    fs::path root, data, catalog, database, settings, sourceCache;
+    bool directoryPopup = false, directoryRequired = true;
+    std::string directoryDraft, directoryError;
     std::array<std::vector<J>, 4> models, clips;
     std::array<bool, 4> loaded{};
     int modelTab = 1, clipTab = 1;
     std::string modelSearch, clipSearch, donorSearch,
-        gameRoot = "F:\\CODMGameApps", status = "Choose a model or refresh the library.", details;
+        gameRoot, status = "Choose a model or refresh the library.", details;
     bool textOnly = false, completeOnly = true, applicableOnly = true, playing = false,
          exportPopup = false, donorPopup = false, dirtySettings = false;
     bool showLods = false;
@@ -148,7 +167,7 @@ struct Studio {
     std::string inheritedStatus;
     explicit Studio(fs::path directory)
         : root(std::move(directory)), data(root / "bin/data"), catalog(root / "catalog.json"),
-          database(root / "library.sqlite"), settings(root / "studio.json") {
+          database(root / "library.sqlite"), settings(root / "studio.json"), sourceCache(root / "cache") {
         if (!fs::exists(data))
             data = root / "data";
         if(fs::exists(data/"weapon-reference.json")) weaponReference=read_json(data/"weapon-reference.json");
@@ -167,7 +186,7 @@ struct Studio {
                 auto j = read_json(settings);
                 modelsDestination = j.value("modelsDestination", modelsDestination);
                 animationsDestination = j.value("animationsDestination", animationsDestination);
-                gameRoot = j.value("gameRoot", gameRoot);
+                directoryDraft = j.value("gameRoot", std::string());
                 textOnly = j.value("textOnly", false);
                 omitUnresolved = j.value("omitUnresolved", true);
                 galleryMode = j.value("galleryMode", false);
@@ -181,6 +200,54 @@ struct Studio {
             } catch (const std::exception &e) {
                 details = e.what();
             }
+        gameRoot = read_game_directory(root / "settings.ini");
+        directoryRequired = gameRoot.empty() || !fs::is_directory(pathof(gameRoot));
+        if (!gameRoot.empty()) directoryDraft = gameRoot;
+        directoryPopup = directoryRequired;
+        if (!directoryRequired) configure_source_paths();
+    }
+    void configure_source_paths() {
+        // Keep installation-specific indexes and caches separate. A matching legacy index remains usable.
+        auto key = directory_key(gameRoot);
+        uint64_t hash = 14695981039346656037ull;
+        for (unsigned char c : key) { hash ^= c; hash *= 1099511628211ull; }
+        auto base = root / "libraries" / hex64(hash);
+        try {
+            auto legacy = root / "catalog.json";
+            if (fs::exists(legacy) && directory_key(read_json(legacy).at("root").get<std::string>()) == key) base = root;
+        } catch (const std::exception &) {}
+        fs::create_directories(base);
+        catalog = base / "catalog.json"; database = base / "library.sqlite"; sourceCache = base / "cache";
+    }
+    bool set_game_directory(bool startLoading = true) {
+        directoryError.clear();
+        try {
+            require(tasks.empty(), "Wait for current jobs to finish or cancel them before changing folders.");
+            require(!directoryDraft.empty() && fs::is_directory(pathof(directoryDraft)), "Choose an existing CODM installation folder.");
+            auto chosen = pathstr(fs::weakly_canonical(pathof(directoryDraft)));
+            save_game_directory(root / "settings.ini", chosen);
+            gameRoot = chosen; configure_source_paths(); directoryRequired = false;
+            ++revision; ++batchRevision;
+            for (auto &token : rowRevisions) ++token;
+            for (auto &rows : models) rows.clear();
+            for (auto &rows : clips) rows.clear();
+            for (auto &marked : checkedModels) marked.clear();
+            rangeAnchor.fill({}); loaded.fill(false);
+            selected = selectedClip = profile = companion = nullptr;
+            preview.reset(); materials.reset(); animation.reset(); animationBounds.reset();
+            poseCache = PreviewPoseCache{}; playing = false; uploadPending = true;
+            choices = overrides = J::object(); inheritedClips = J::array();
+            batchPlan = nullptr; batchEntries.clear(); knownIssues = J::object();
+            modelFilterKey.clear(); clipFilterKey.clear(); partStateKey.clear(); familyMenuSize=SIZE_MAX;
+            galleryIcons = J::object(); galleryReady = galleryBusy = false;
+            galleryError.clear(); galleryMissing.clear();
+            for (auto &[key, texture] : galleryTextures) glDeleteTextures(1, &texture.id);
+            galleryTextures.clear(); status = "CODM directory saved.";
+            if (startLoading) {
+                if (fs::exists(database)) load_rows(modelTab); else index(modelTab, true);
+            }
+            return true;
+        } catch (const std::exception &e) { directoryError = e.what(); return false; }
     }
     std::string issue_text(const J &report) const {
         std::string result;
@@ -290,7 +357,6 @@ struct Studio {
         if (dirtySettings) {
             write_json(settings, {{"modelsDestination", modelsDestination},
                                   {"animationsDestination", animationsDestination},
-                                  {"gameRoot", gameRoot},
                                   {"textOnly", textOnly},
                                   {"omitUnresolved", omitUnresolved},
                                   {"galleryMode", galleryMode},
@@ -307,6 +373,7 @@ struct Studio {
                 t->context.cancel = true;
     }
     void load_rows(int tab) {
+        if (directoryRequired) return;
         for(const auto &task: tasks)
             if(!task->done && task->name == "Read " + categories[tab] + " library") return;
         for (auto &task : tasks)
@@ -337,6 +404,7 @@ struct Studio {
         });
     }
     void index(int tab, bool scan = false) {
+        if (directoryRequired) { directoryPopup = true; return; }
         for (auto &t : tasks)
             if (t->name == "Index library") {
                 status = "An index job is already running. Other loaded tabs remain usable.";
@@ -563,7 +631,7 @@ struct Studio {
             if ((discover || currentProfile.is_null()) && is_weapon_entry(entry)) {
                 job.update(0, "Discovering compatible variant parts");
                 auto previousProfile = currentProfile;
-                currentProfile = discover_parts(source, entry, root / "cache/parts", &job);
+                currentProfile = discover_parts(source, entry, sourceCache / "parts", &job);
                 if (!previousProfile.is_null())
                     for (auto &oldSlot : previousProfile.at("slots")) {
                         for (auto &option : oldSlot.at("options"))
@@ -643,7 +711,7 @@ struct Studio {
         run("Discover parts",
             [this, token, entry, oldChoices, oldProfile](JobContext &job) mutable {
                 Source source(catalog, data);
-                auto p = discover_parts(source, entry, root / "cache/parts", &job);
+                auto p = discover_parts(source, entry, sourceCache / "parts", &job);
                 if (!oldProfile.is_null())
                     for (auto &oldSlot : oldProfile.at("slots"))
                         for (auto &option : oldSlot.at("options"))
@@ -690,10 +758,10 @@ struct Studio {
             [this, token, entry, donor, oldProfile, oldChoices](JobContext &job) mutable {
                 Source source(catalog, data);
                 if (oldProfile.is_null()) {
-                    oldProfile = discover_parts(source, entry, root / "cache/parts", &job);
+                    oldProfile = discover_parts(source, entry, sourceCache / "parts", &job);
                     resolve_parts(oldProfile, oldChoices, true, nullptr, false);
                 }
-                auto p = discover_parts(source, entry, root / "cache/parts", &job, donor);
+                auto p = discover_parts(source, entry, sourceCache / "parts", &job, donor);
                 if (!oldProfile.is_null()) {
                     for (auto &slot : p["slots"]) {
                         bool found = false;
@@ -763,7 +831,7 @@ struct Studio {
         run("Index weapon icons",[this](JobContext &job) {
             try {
                 Source source(catalog,data);
-                auto result=weapon_icon_index(source,root/"cache/gallery",&job);
+                auto result=weapon_icon_index(source,sourceCache/"gallery",&job);
                 post([this,result=std::move(result)] {
                     galleryIcons=result.at("icons"); galleryReady=true; galleryBusy=false;
                     galleryChoiceFilter.clear(); modelFilterKey.clear();
@@ -788,7 +856,7 @@ struct Studio {
             try {
                 for(auto it=requested.begin();it!=requested.end();++it) {
                     job.check();
-                    try { images[it.key()]=weapon_thumbnail(it.value(),root/"cache/gallery/thumbs",catalog,data,source,atlases); }
+                    try { images[it.key()]=weapon_thumbnail(it.value(),sourceCache/"gallery/thumbs",catalog,data,source,atlases); }
                     catch(const std::exception &) { failed.insert(it.key()); }
                 }
             } catch(const std::exception &) { }
@@ -1026,7 +1094,7 @@ void Studio::draw() {
     auto &io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(io.DisplaySize);
-    ImGui::Begin("codm2cast_v10", nullptr,
+    ImGui::Begin("codm2cast_v11", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoSavedSettings);
     if (ImGui::Checkbox("Text only", &textOnly)) {
@@ -1043,6 +1111,34 @@ void Studio::draw() {
     ImGui::SameLine();
     if (ImGui::Button("Rescan game files"))
         index(modelTab, true);
+    ImGui::SameLine();
+    float directoryButtonWidth = ImGui::CalcTextSize("CODM directory...").x + 2 * ImGui::GetStyle().FramePadding.x;
+    ImGui::SetCursorPosX(std::max(ImGui::GetCursorPosX(), ImGui::GetWindowContentRegionMax().x - directoryButtonWidth));
+    if (ImGui::Button("CODM directory...")) {
+        directoryDraft = gameRoot; directoryError.clear(); directoryPopup = true;
+    }
+    observe("CODM directory");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", gameRoot.empty() ? "Choose your CODM installation folder" : gameRoot.c_str());
+    if (directoryPopup) { ImGui::OpenPopup("Choose CODM directory"); directoryPopup = false; }
+    ImGui::SetNextWindowSize(ImVec2(600, 0), ImGuiCond_Appearing);
+    if (ImGui::BeginPopupModal("Choose CODM directory", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::TextWrapped("Choose the CODM Chinese PC installation folder containing your game files. The folder is saved in settings.ini.");
+        ImGui::SetNextItemWidth(470);
+        ImGui::InputText("##codmDirectory", &directoryDraft); observe("CODM directory input");
+        ImGui::SameLine();
+        if (ImGui::Button("Browse...")) { auto folder = folder_dialog(nullptr, directoryDraft); if (!folder.empty()) directoryDraft = folder; }
+        if (!directoryError.empty()) ImGui::TextWrapped("%s", directoryError.c_str());
+        if (!tasks.empty()) ImGui::TextWrapped("Wait for current jobs to finish or cancel them before changing folders.");
+        ImGui::BeginDisabled(!tasks.empty());
+        if (ImGui::Button("Save and load")) { if (set_game_directory()) ImGui::CloseCurrentPopup(); }
+        observe("Save CODM directory"); ImGui::EndDisabled();
+        ImGui::SameLine();
+        if (ImGui::Button(directoryRequired ? "Exit" : "Cancel")) {
+            if (directoryRequired) glfwSetWindowShouldClose(window, GLFW_TRUE);
+            ImGui::CloseCurrentPopup();
+        }
+        observe("Cancel CODM directory"); ImGui::EndPopup();
+    }
     ImGui::Separator();
     float available = ImGui::GetContentRegionAvail().x;
     float side = std::clamp(available * .23f, 245.f, 365.f);
@@ -1503,9 +1599,6 @@ void Studio::draw() {
         ImGui::PopID();
     }
     if (ImGui::CollapsingHeader("Details", ImGuiTreeNodeFlags_DefaultOpen)) {
-        ImGui::SetNextItemWidth(-120);
-        if (ImGui::InputText("Game folder", &gameRoot))
-            dirtySettings = true;
         if (ImGui::Button("Copy details"))
             ImGui::SetClipboardText(details.c_str());
         ImGui::SameLine();
@@ -2027,6 +2120,31 @@ J studio_checks(const fs::path &directory) {
                 {"staleSelectionIgnored", false},
                 {"workerLimit", 3}};
     require(!ExportRequest{}.t6, "Export requests must default to source rigs");
+    {
+        Studio fresh(scratch);
+        require(fresh.directoryRequired && fresh.directoryPopup && fresh.gameRoot.empty(), "Fresh startup did not request a CODM directory");
+        fresh.directoryDraft = pathstr(scratch / "missing");
+        require(!fresh.set_game_directory(false) && !fs::exists(scratch / "settings.ini"), "Invalid directory was saved");
+        auto firstFolder = scratch / fs::path(L"CODM folder \u65e5\u672c");
+        auto secondFolder = scratch / "another installation";
+        fs::create_directory(firstFolder); fs::create_directory(secondFolder);
+        fresh.directoryDraft = pathstr(firstFolder);
+        require(fresh.set_game_directory(false), fresh.directoryError);
+        auto firstDatabase = fresh.database;
+        Studio reopened(scratch);
+        require(!reopened.directoryRequired && !reopened.directoryPopup && fs::equivalent(pathof(reopened.gameRoot), firstFolder), "Saved Unicode directory did not suppress startup prompt");
+        reopened.models[1].push_back({{"id","previous-installation"}});
+        reopened.directoryDraft = pathstr(secondFolder);
+        require(reopened.set_game_directory(false), reopened.directoryError);
+        require(reopened.database != firstDatabase && reopened.models[1].empty(), "Changing installation reused old library rows or database");
+        Studio changed(scratch);
+        require(fs::equivalent(pathof(changed.gameRoot), secondFolder), "Changed directory did not persist");
+        save_game_directory(scratch / "settings.ini", pathstr(scratch / "unavailable"));
+        Studio unavailable(scratch);
+        require(unavailable.directoryRequired && unavailable.directoryPopup, "Unavailable saved directory was not recoverable");
+        report["directoryPromptAndPersistence"] = true;
+        report["installationCacheIsolation"] = true;
+    }
     write_json(scratch / "studio.json", {{"t6",true},{"t6OptInVersion",1}});
     {Studio migrated(scratch);migrated.save();}
     require(!read_json(scratch / "studio.json").contains("t6"),"Removed rig preference persisted");
@@ -2112,6 +2230,7 @@ struct StudioInputCheck {
     std::string modelPath = "X:\\model folder\\unfinished ";
     std::string animationPath = "Y:\\different parent\\animations\\";
     explicit StudioInputCheck(Studio &studio, bool synthetic = true) : app(studio) {
+        app.directoryRequired = false; app.directoryPopup = false;
         app.textOnly = true;
         app.applicableOnly = false;
         app.loaded.fill(true);
@@ -2133,6 +2252,13 @@ struct StudioInputCheck {
                              {"category", categories[i]}}};
         }
         add([] {});
+        add([this] { app.directoryRequired = true; app.directoryPopup = true; });
+        check("First launch requests CODM directory", [this] { return items.contains("Save CODM directory") && items.at("Save CODM directory").visible; });
+        add([this] { app.directoryRequired = false; });
+        click("Cancel CODM directory");
+        click("CODM directory");
+        check("Top-right directory control opens folder settings", [this] { return items.contains("CODM directory input") && items.at("CODM directory input").visible; });
+        click("Cancel CODM directory");
         for (int i = 0; i < 4; i++) {
             click("Models/" + categories[i]);
             click("Model row/ui-model:" + std::to_string(i));
@@ -2442,7 +2568,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
             glfwWindowHint(GLFW_FOCUSED, GLFW_FALSE);
         }
-        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v10", nullptr, nullptr);
+        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v11", nullptr, nullptr);
         require(app.window != nullptr, "Could not create OpenGL preview window");
         glfwMakeContextCurrent(app.window);
         glfwSwapInterval(viewportBench ? 0 : 1);
@@ -2518,8 +2644,10 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
                 std::make_unique<StudioSourceInputCheck>(app, read_json(sourcePlan), uiOutput);
         else if (uiCheck)
             inputCheck = std::make_unique<StudioInputCheck>(app);
-        else if(!gallerySmoke)
-            app.load_rows(app.modelTab);
+        else if(!gallerySmoke && !app.directoryRequired) {
+            if (fs::exists(app.database)) app.load_rows(app.modelTab);
+            else app.index(app.modelTab, !fs::exists(app.catalog));
+        }
         int renderedFrames = 0;
         std::array<std::vector<double>,3> renderSamples,frameSamples;
         std::shared_ptr<Animation> benchmarkAnimation;
@@ -2649,7 +2777,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             write_json(smokeImage.parent_path() / (smokeImage.stem().string() + "-error.json"),
                        {{"error", e.what()}});
         else
-            MessageBoxA(nullptr, e.what(), "codm2cast_v10", MB_ICONERROR);
+            MessageBoxA(nullptr, e.what(), "codm2cast_v11", MB_ICONERROR);
         exitCode = 1;
     }
     CoUninitialize();

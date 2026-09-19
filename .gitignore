@@ -12,3 +12,6 @@
 *.pdb
 *.obj
 *.user
+
+/settings.ini
+/libraries/

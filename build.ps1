@@ -1,4 +1,4 @@
-param([string] $Target = 'all', [string] $StudioOutputName = 'codm2cast_v10')
+param([string] $Target = 'all', [string] $StudioOutputName = 'codm2cast_v11')
 $ErrorActionPreference = 'Stop'
 $buildTemp = Join-Path $PSScriptRoot 'work\temp'
 New-Item -ItemType Directory -Force -Path $buildTemp | Out-Null
