@@ -1,0 +1,1124 @@
+{
+  "updated": "2026-09-15",
+  "note": "Reference existence is not proof an asset is installed. Exact normalized skin matches only; no guessed marketing-to-internal links.",
+  "weapons": [
+    {
+      "id": "cronensquall",
+      "name": "Cronen Squall",
+      "category": "ar",
+      "aliases": [
+        "cronensquall"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "isohemlock",
+      "name": "ISO Hemlock",
+      "category": "ar",
+      "aliases": [
+        "isohemlock"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "bal27",
+      "name": "BAL-27",
+      "category": "ar",
+      "aliases": [
+        "bal27"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "ram7",
+      "name": "RAM-7",
+      "category": "ar",
+      "aliases": [
+        "ram7"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "lachmann556",
+      "name": "Lachmann-556",
+      "category": "ar",
+      "aliases": [
+        "lachmann556"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "xm4",
+      "name": "XM4",
+      "category": "ar",
+      "aliases": [
+        "xm4"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "lag53",
+      "name": "LAG 53",
+      "category": "ar",
+      "aliases": [
+        "lag53"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "vargos",
+      "name": "Vargo-S",
+      "category": "ar",
+      "aliases": [
+        "vargos"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "type19",
+      "name": "Type 19",
+      "category": "ar",
+      "aliases": [
+        "type19"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "bp50",
+      "name": "BP50",
+      "category": "ar",
+      "aliases": [
+        "bp50"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "grau556",
+      "name": "Grau 5.56",
+      "category": "ar",
+      "aliases": [
+        "grau556"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "groza",
+      "name": "Groza",
+      "category": "ar",
+      "aliases": [
+        "groza"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "maddox",
+      "name": "Maddox",
+      "category": "ar",
+      "aliases": [
+        "maddox"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "ffar1",
+      "name": "FFAR 1",
+      "category": "ar",
+      "aliases": [
+        "ffar1"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "krig6",
+      "name": "Krig 6",
+      "category": "ar",
+      "aliases": [
+        "krig6"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "em2",
+      "name": "EM2",
+      "category": "ar",
+      "aliases": [
+        "em2"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "kilo141",
+      "name": "Kilo 141",
+      "category": "ar",
+      "aliases": [
+        "kilo141"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "oden",
+      "name": "Oden",
+      "category": "ar",
+      "aliases": [
+        "oden"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "m13",
+      "name": "M13",
+      "category": "ar",
+      "aliases": [
+        "m13"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "swordfish",
+      "name": "Swordfish",
+      "category": "ar",
+      "aliases": [
+        "swordfish"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "asval",
+      "name": "AS VAL",
+      "category": "ar",
+      "aliases": [
+        "asval"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "cr56amax",
+      "name": "CR-56 AMAX",
+      "category": "ar",
+      "aliases": [
+        "cr56amax"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "peacekeepermk2",
+      "name": "Peacekeeper MK2",
+      "category": "ar",
+      "aliases": [
+        "peacekeepermk2",
+        "peacekeeper"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "fr556",
+      "name": "FR.556",
+      "category": "ar",
+      "aliases": [
+        "fr556"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "hvk30",
+      "name": "HVK-30",
+      "category": "ar",
+      "aliases": [
+        "hvk30"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "drh",
+      "name": "DR-H",
+      "category": "ar",
+      "aliases": [
+        "drh"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "kn44",
+      "name": "KN-44",
+      "category": "ar",
+      "aliases": [
+        "kn44"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "hbra3",
+      "name": "HBRa3",
+      "category": "ar",
+      "aliases": [
+        "hbra3"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "icr1",
+      "name": "ICR-1",
+      "category": "ar",
+      "aliases": [
+        "icr1",
+        "icr"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "manowar",
+      "name": "Man-O-War",
+      "category": "ar",
+      "aliases": [
+        "manowar"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "bk57",
+      "name": "BK57",
+      "category": "ar",
+      "aliases": [
+        "bk57"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "lk24",
+      "name": "LK24",
+      "category": "ar",
+      "aliases": [
+        "lk24"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "asm10",
+      "name": "ASM10",
+      "category": "ar",
+      "aliases": [
+        "asm10"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "m4",
+      "name": "M4",
+      "category": "ar",
+      "aliases": [
+        "m4"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "ak117",
+      "name": "AK117",
+      "category": "ar",
+      "aliases": [
+        "ak117"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "ak47",
+      "name": "AK-47",
+      "category": "ar",
+      "aliases": [
+        "ak47"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "type25",
+      "name": "Type 25",
+      "category": "ar",
+      "aliases": [
+        "type25"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "m16",
+      "name": "M16",
+      "category": "ar",
+      "aliases": [
+        "m16",
+        "m16a4"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-assault-rifle-weapon-list"
+    },
+    {
+      "id": "statichv",
+      "name": "Static HV",
+      "category": "smg",
+      "aliases": [
+        "statichv"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "fsshurricane",
+      "name": "FSS Hurricane",
+      "category": "smg",
+      "aliases": [
+        "fsshurricane"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "lc10",
+      "name": "LC10",
+      "category": "smg",
+      "aliases": [
+        "lc10"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "sten",
+      "name": "Sten",
+      "category": "smg",
+      "aliases": [
+        "sten"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "vmp",
+      "name": "VMP",
+      "category": "smg",
+      "aliases": [
+        "vmp"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "iso",
+      "name": "ISO",
+      "category": "smg",
+      "aliases": [
+        "iso"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "uss9",
+      "name": "USS 9",
+      "category": "smg",
+      "aliases": [
+        "uss9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "tec9",
+      "name": "Tec-9",
+      "category": "smg",
+      "aliases": [
+        "tec9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "cx9",
+      "name": "CX-9",
+      "category": "smg",
+      "aliases": [
+        "cx9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "striker45",
+      "name": "Striker 45",
+      "category": "smg",
+      "aliases": [
+        "striker45"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "ots9",
+      "name": "OTs 9",
+      "category": "smg",
+      "aliases": [
+        "ots9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "lapa",
+      "name": "LAPA",
+      "category": "smg",
+      "aliases": [
+        "lapa"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "switchbladex9",
+      "name": "Switchblade X9",
+      "category": "smg",
+      "aliases": [
+        "switchbladex9",
+        "switchblade9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "ksp45",
+      "name": "KSP 45",
+      "category": "smg",
+      "aliases": [
+        "ksp45"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "mac10",
+      "name": "MAC-10",
+      "category": "smg",
+      "aliases": [
+        "mac10"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "ppsh41",
+      "name": "PPSh-41",
+      "category": "smg",
+      "aliases": [
+        "ppsh41"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "cbr4",
+      "name": "CBR4",
+      "category": "smg",
+      "aliases": [
+        "cbr4"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "mx9",
+      "name": "MX9",
+      "category": "smg",
+      "aliases": [
+        "mx9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "pp19bizon",
+      "name": "PP19 Bizon",
+      "category": "smg",
+      "aliases": [
+        "pp19bizon"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "qxr",
+      "name": "QXR",
+      "category": "smg",
+      "aliases": [
+        "qxr"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "agr556",
+      "name": "AGR 556",
+      "category": "smg",
+      "aliases": [
+        "agr556"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "qq9",
+      "name": "QQ9",
+      "category": "smg",
+      "aliases": [
+        "qq9",
+        "mp5"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "fennec",
+      "name": "Fennec",
+      "category": "smg",
+      "aliases": [
+        "fennec"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "gks",
+      "name": "GKS",
+      "category": "smg",
+      "aliases": [
+        "gks"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "cordite",
+      "name": "Cordite",
+      "category": "smg",
+      "aliases": [
+        "cordite"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "hg40",
+      "name": "HG 40",
+      "category": "smg",
+      "aliases": [
+        "hg40"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "pharo",
+      "name": "Pharo",
+      "category": "smg",
+      "aliases": [
+        "pharo"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "razorback",
+      "name": "Razorback",
+      "category": "smg",
+      "aliases": [
+        "razorback"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "msmc",
+      "name": "MSMC",
+      "category": "smg",
+      "aliases": [
+        "msmc"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "chicom",
+      "name": "Chicom",
+      "category": "smg",
+      "aliases": [
+        "chicom"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "pdw57",
+      "name": "PDW-57",
+      "category": "smg",
+      "aliases": [
+        "pdw57"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "rus79u",
+      "name": "RUS-79U",
+      "category": "smg",
+      "aliases": [
+        "rus79u",
+        "aks74u"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-submachine-gun-weapon-list"
+    },
+    {
+      "id": "raalmg",
+      "name": "RAAL MG",
+      "category": "lmg",
+      "aliases": [
+        "raalmg",
+        "raal"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "mg42",
+      "name": "MG42",
+      "category": "lmg",
+      "aliases": [
+        "mg42"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "bruenmk9",
+      "name": "Bruen MK9",
+      "category": "lmg",
+      "aliases": [
+        "bruenmk9"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "dingo",
+      "name": "Dingo",
+      "category": "lmg",
+      "aliases": [
+        "dingo"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "pkm",
+      "name": "PKM",
+      "category": "lmg",
+      "aliases": [
+        "pkm"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "hades",
+      "name": "Hades",
+      "category": "lmg",
+      "aliases": [
+        "hades"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "holger26",
+      "name": "Holger 26",
+      "category": "lmg",
+      "aliases": [
+        "holger26",
+        "holger"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "chopper",
+      "name": "Chopper",
+      "category": "lmg",
+      "aliases": [
+        "chopper"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "m4lmg",
+      "name": "M4LMG",
+      "category": "lmg",
+      "aliases": [
+        "m4lmg"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "rpd",
+      "name": "RPD",
+      "category": "lmg",
+      "aliases": [
+        "rpd"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "ul736",
+      "name": "UL736",
+      "category": "lmg",
+      "aliases": [
+        "ul736"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "s36",
+      "name": "S36",
+      "category": "lmg",
+      "aliases": [
+        "s36"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-light-machine-gun-weapon-list"
+    },
+    {
+      "id": "lw3tundra",
+      "name": "LW3-Tundra",
+      "category": "sniper",
+      "aliases": [
+        "lw3tundra",
+        "tundra"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "zrg20mm",
+      "name": "ZRG 20mm",
+      "category": "sniper",
+      "aliases": [
+        "zrg20mm"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "hdr",
+      "name": "HDR",
+      "category": "sniper",
+      "aliases": [
+        "hdr"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "koshka",
+      "name": "Koshka",
+      "category": "sniper",
+      "aliases": [
+        "koshka"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "svd",
+      "name": "SVD",
+      "category": "sniper",
+      "aliases": [
+        "svd"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "rytecamr",
+      "name": "Rytec AMR",
+      "category": "sniper",
+      "aliases": [
+        "rytecamr",
+        "rytec"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "na45",
+      "name": "NA-45",
+      "category": "sniper",
+      "aliases": [
+        "na45"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "outlaw",
+      "name": "Outlaw",
+      "category": "sniper",
+      "aliases": [
+        "outlaw"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "locus",
+      "name": "Locus",
+      "category": "sniper",
+      "aliases": [
+        "locus"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "dlq33",
+      "name": "DL Q33",
+      "category": "sniper",
+      "aliases": [
+        "dlq33"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "xpr50",
+      "name": "XPR-50",
+      "category": "sniper",
+      "aliases": [
+        "xpr50"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "m21ebr",
+      "name": "M21 EBR",
+      "category": "sniper",
+      "aliases": [
+        "m21ebr"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "arctic50",
+      "name": "Arctic.50",
+      "category": "sniper",
+      "aliases": [
+        "arctic50"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-sniper-rifle-weapon-list"
+    },
+    {
+      "id": "by15",
+      "name": "BY15",
+      "category": "shotty",
+      "aliases": [
+        "by15"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "hs0405",
+      "name": "HS0405",
+      "category": "shotty",
+      "aliases": [
+        "hs0405"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "hs2126",
+      "name": "HS2126",
+      "category": "shotty",
+      "aliases": [
+        "hs2126"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "striker",
+      "name": "Striker",
+      "category": "shotty",
+      "aliases": [
+        "striker"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "krm262",
+      "name": "KRM 262",
+      "category": "shotty",
+      "aliases": [
+        "krm262"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "echo",
+      "name": "Echo",
+      "category": "shotty",
+      "aliases": [
+        "echo"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "r90",
+      "name": "R9-0",
+      "category": "shotty",
+      "aliases": [
+        "r90"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-shotgun-weapon-list"
+    },
+    {
+      "id": "mw11",
+      "name": "MW11",
+      "category": "pistol",
+      "aliases": [
+        "mw11"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "j358",
+      "name": "J358",
+      "category": "pistol",
+      "aliases": [
+        "j358"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "50gs",
+      "name": ".50 GS",
+      "category": "pistol",
+      "aliases": [
+        "50gs"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "renetti",
+      "name": "Renetti",
+      "category": "pistol",
+      "aliases": [
+        "renetti"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "crossbow",
+      "name": "Crossbow",
+      "category": "pistol",
+      "aliases": [
+        "crossbow"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "shorty",
+      "name": "Shorty",
+      "category": "pistol",
+      "aliases": [
+        "shorty"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-pistol-weapon-list"
+    },
+    {
+      "id": "smrs",
+      "name": "SMRS",
+      "category": "launch",
+      "aliases": [
+        "smrs"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-launcher-weapon-list"
+    },
+    {
+      "id": "fhj18",
+      "name": "FHJ-18",
+      "category": "launch",
+      "aliases": [
+        "fhj18"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-launcher-weapon-list"
+    },
+    {
+      "id": "thumper",
+      "name": "Thumper",
+      "category": "launch",
+      "aliases": [
+        "thumper"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-launcher-weapon-list"
+    },
+    {
+      "id": "d13sector",
+      "name": "D13 Sector",
+      "category": "launch",
+      "aliases": [
+        "d13sector"
+      ],
+      "source": "https://zilliongamer.com/call-of-duty-mobile/c/weapon-list/call-of-duty-mobile-launcher-weapon-list"
+    }
+  ],
+  "skins": [
+    {
+      "weapon": "koshka",
+      "name": "Illusory Moon",
+      "key": "koshkaillusorymoon",
+      "season": "2024 S10 - 5th Anniversary",
+      "source": "https://www.callofduty.com/blog/2024/11/call-of-duty-mobile-season-10-fifth-anniversary-celebration-announcement"
+    },
+    {
+      "weapon": "ffar1",
+      "name": "Surrenderer",
+      "key": "ffar1surrenderer",
+      "season": "2024 S10 - 5th Anniversary",
+      "source": "https://www.callofduty.com/blog/2024/11/call-of-duty-mobile-season-10-fifth-anniversary-celebration-announcement"
+    },
+    {
+      "weapon": "m4",
+      "name": "Long Ace",
+      "key": "m4longace",
+      "season": "2024 S10 - 5th Anniversary",
+      "source": "https://www.callofduty.com/blog/2024/11/call-of-duty-mobile-season-10-fifth-anniversary-celebration-announcement"
+    },
+    {
+      "weapon": "uss9",
+      "name": "The Lovers",
+      "key": "uss9thelovers",
+      "season": "2024 S10 - 5th Anniversary",
+      "source": "https://www.callofduty.com/blog/2024/11/call-of-duty-mobile-season-10-fifth-anniversary-celebration-announcement"
+    },
+    {
+      "weapon": "cordite",
+      "name": "Final Card",
+      "key": "corditefinalcard",
+      "season": "2024 S10 - 5th Anniversary",
+      "source": "https://www.callofduty.com/blog/2024/11/call-of-duty-mobile-season-10-fifth-anniversary-celebration-announcement"
+    },
+    {
+      "weapon": "ak117",
+      "name": "Lava Remix",
+      "key": "ak117lavaremix",
+      "season": "2025 S1 - Wings of Vengeance",
+      "source": "https://www.callofduty.com/uk/en/blog/2025/01/call-of-duty-mobile-season-one-wings-of-vengeance-announcement"
+    },
+    {
+      "weapon": "xm4",
+      "name": "Luminescent Jade",
+      "key": "xm4luminescentjade",
+      "season": "2025 S1 - Wings of Vengeance",
+      "source": "https://www.callofduty.com/uk/en/blog/2025/01/call-of-duty-mobile-season-one-wings-of-vengeance-announcement"
+    },
+    {
+      "weapon": "cr56amax",
+      "name": "Final Testament",
+      "key": "cr56amaxfinaltestament",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "chopper",
+      "name": "The Great Beyond",
+      "key": "chopperthegreatbeyond",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "m4",
+      "name": "Nocturne Mortis",
+      "key": "m4nocturnemortis",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "kiloboltaction",
+      "name": "Rex Mortem",
+      "key": "kiloboltactionrexmortem",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "cx9",
+      "name": "Deathly Light",
+      "key": "cx9deathlylight",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "cx9",
+      "name": "Lethal Hollow",
+      "key": "cx9lethalhollow",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    },
+    {
+      "weapon": "oden",
+      "name": "Dark Threshold",
+      "key": "odendarkthreshold",
+      "season": "2023 S9 - Graveyard Shift",
+      "source": "https://www.callofduty.com/ca/en/blog/2023/09/call-of-duty-mobile-season-09-graveyard-shift"
+    }
+  ]
+}

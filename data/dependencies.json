@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/single_include/nlohmann/json.hpp",
+    "path": "vendor/nlohmann/json.hpp",
+    "sha256": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/nlohmann/json/v3.12.0/LICENSE.MIT",
+    "path": "licenses/nlohmann-json.txt",
+    "sha256": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/lz4/lz4/v1.10.0/lib/lz4.c",
+    "path": "vendor/lz4/lz4.c",
+    "sha256": "9396f7de527bc8435de9c7569fb7998e56545a84b4f3c2d808c0235c01774539"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/lz4/lz4/v1.10.0/lib/lz4.h",
+    "path": "vendor/lz4/lz4.h",
+    "sha256": "26b82efc53d1570f3b54eef02e9c4764c1ad374ff03cac04e2ced5ea4d4c552f"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/lz4/lz4/v1.10.0/lib/LICENSE",
+    "path": "licenses/lz4.txt",
+    "sha256": "8b58c446121a109ccf32edc094bba3010a3d85e4ee3702950db55e4d3e87736c"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/g-truc/glm/1.0.1/copying.txt",
+    "path": "licenses/glm.txt",
+    "sha256": "62d2d642c7d054d4fb4c9b42faad617d6c88fcd91e317f8035aa9f277cc159c3"
+  }
+]

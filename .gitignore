@@ -1,0 +1,14 @@
+/bin/
+/work/
+/cache/
+/exports/
+/catalog*.json*
+/index-*.json
+/library.sqlite*
+/studio.json
+/asset-issues.json
+/export-names.json
+/gallery-tags.json
+*.pdb
+*.obj
+*.user

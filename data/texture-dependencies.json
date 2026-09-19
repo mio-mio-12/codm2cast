@@ -1,0 +1,10 @@
+{
+  "texture2ddecoder": {
+    "repository": "K0lb3/texture2ddecoder",
+    "commit": "3ebc3b758bd6b1a3108b50148f7998ee34f058c6"
+  },
+  "stb": {
+    "repository": "nothings/stb",
+    "commit": "2c980bb59875b0d32144a71867fbdebb2f77cd20"
+  }
+}
