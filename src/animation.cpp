@@ -702,6 +702,12 @@ std::string action_name(const std::string &sourceName) {
         }
     auto k = lower(s);
     static const std::map<std::string, std::string> actions = {{"idle", "idle"},
+                                                               {"idlepose", "idle"},
+                                                               {"weaponchangeclip", "reload"},
+                                                               {"weaponchangeclip_e", "reload_empty"},
+                                                               {"weaponquickchangeclip", "reload_quick"},
+                                                               {"weaponquickchangeclip_e", "reload_quick_empty"},
+                                                               {"unaimingon", "ads_down"},
                                                                {"unaimingidle", "idle"},
                                                                {"unaimingfire", "fire"},
                                                                {"fire", "fire"},

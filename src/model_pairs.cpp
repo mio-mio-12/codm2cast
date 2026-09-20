@@ -90,6 +90,44 @@ J export_selected_models(const ExportRequest &options,const J &plan,bool skipExi
                 auto request=options;request.entry=entry;request.stem=stem;request.t6=false;
                 request.model=!(skipExisting && existing);request.discoverParts=true;request.includeWorldmodel=false;request.allWeaponClips=animations;request.clips=J::array();
                 request.category=detect_export_name(entry,entries).category;
+                if(entry.contains("configuration")) {
+                    const auto &configuration=entry.at("configuration");
+                    auto choices=configuration.at("choices");
+                    require(configuration.at("profile").at("entryId")==entry.at("id"),"Saved assembly belongs to another weapon");
+                    request.parts=resolve_parts(configuration.at("profile"),choices,true);
+                    request.overrides=configuration.value("overrides",J::object());
+                    request.discoverParts=false;
+                    item["configuration"]={{"choices",choices},{"parts",request.parts}};
+                }
+                else for(const auto &pair:plan.at("pairs")) {
+                    std::string other;
+                    if(pair.at("source")==entry.at("id"))other=pair.at("companion");
+                    else if(pair.at("companion")==entry.at("id"))other=pair.at("source");
+                    if(other.empty())continue;
+                    for(const auto &candidate:entries)if(candidate.at("id")==other && candidate.contains("configuration")) {
+                        const auto &configuration=candidate.at("configuration");
+                        Source source(request.catalog,request.data);
+                        auto profile=discover_parts(source,entry,request.catalog.parent_path()/"cache/parts",job);
+                        J choices=J::object();
+                        for(const auto &slot:profile.at("slots")) {
+                            auto slotId=slot.at("id").get<std::string>();
+                            if(!configuration.at("choices").contains(slotId))continue;
+                            const auto &chosen=configuration.at("choices").at(slotId);
+                            if(chosen.is_null()){choices[slotId]=nullptr;continue;}
+                            std::set<std::string> matches;
+                            for(const auto &sourceSlot:configuration.at("profile").at("slots"))if(sourceSlot.at("id")==slotId)
+                                for(const auto &sourcePart:sourceSlot.at("options"))if(sourcePart.at("mesh")==chosen)
+                                    for(const auto &option:slot.at("options")) {
+                                        auto from=weapon_identity(sourcePart.at("name")),to=weapon_identity(option.at("name"));
+                                        if(from && to && from->first==to->first)matches.insert(option.at("mesh"));
+                                    }
+                            require(matches.size()==1,"Configured "+slotId+" has no unique counterpart; configure this perspective explicitly");
+                            choices[slotId]=*matches.begin();
+                        }
+                        request.parts=resolve_parts(profile,choices,true);request.discoverParts=false;
+                        item["configuration"]={{"fromCounterpart",other},{"choices",choices},{"parts",request.parts}};
+                    }
+                }
                 if(!request.model){
                     request.existingModel=options.modelsDestination/(stem+".cast");
                     auto sidecar=options.modelsDestination/(stem+".json");

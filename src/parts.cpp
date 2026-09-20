@@ -127,7 +127,7 @@ J discover_parts(Source &source, const J &entry, const fs::path &cache, JobConte
         auto path = b.at("path").get<std::string>();
         auto cp =
             cache /
-            (hex64(hash64(path + b.at("size").dump() + b.at("mtime").dump() + "parts4")) + ".json");
+            (hex64(hash64(path + b.at("size").dump() + b.at("mtime").dump() + "parts5")) + ".json");
         source.clear();
         try {
             J names = J::object();
@@ -140,15 +140,17 @@ J discover_parts(Source &source, const J &entry, const fs::path &cache, JobConte
                     if (!source.files.contains(key))
                         continue;
                     for (auto &[pid, o] : source.files.at(key)->objects)
-                        if (o.cid == 33) {
+                        if (o.cid == 33 || o.cid == 137) {
                             try {
-                                auto *mesh = source.ref(o, source.tree(o).at("m_Mesh"));
+                                auto *mesh = o.cid == 137 ? renderer_info(source,o).mesh : source.ref(o, source.tree(o).at("m_Mesh"));
                                 if (!mesh || mesh->cid != 43)
                                     continue;
                                 auto *tr = owner_transform(source, o);
-                                if (source.ref(*tr, source.tree(*tr).at("m_Father")))
-                                    continue;
                                 Hierarchy namesHierarchy(source);
+                                if (o.cid == 137) {
+                                    tr = &namesHierarchy.root(*tr);
+                                    if (!part_identity(namesHierarchy.name(*tr))) continue;
+                                } else if (source.ref(*tr, source.tree(*tr).at("m_Father"))) continue;
                                 auto name = namesHierarchy.name(*tr);
                                 if (!part_identity(name))
                                     name = source.name(*mesh);
@@ -185,13 +187,15 @@ J discover_parts(Source &source, const J &entry, const fs::path &cache, JobConte
                 auto &file = source.file(cab);
                 Hierarchy ph(source);
                 for (auto &[pid, o] : file.objects)
-                    if (o.cid == 33) {
-                        auto *mesh = source.ref(o, source.tree(o).at("m_Mesh"));
-                        if (!mesh || !wanted.contains(o.id()))
+                    if ((o.cid == 33 || o.cid == 137) && wanted.contains(o.id())) {
+                        auto *mesh = o.cid == 137 ? renderer_info(source,o).mesh : source.ref(o, source.tree(o).at("m_Mesh"));
+                        if (!mesh)
                             continue;
                         auto *tr = owner_transform(source, o);
+                        auto *placement = tr;
+                        if (o.cid == 137) tr = &ph.root(*tr);
                         if (source.ref(*tr, source.tree(*tr).at("m_Father")) ||
-                            !source.tree(*mesh).at("m_BindPose").empty())
+                            (o.cid == 33 && !source.tree(*mesh).at("m_BindPose").empty()))
                             continue;
                         auto name = wanted.at(o.id());
                         auto p = *part_identity(name);
@@ -203,7 +207,9 @@ J discover_parts(Source &source, const J &entry, const fs::path &cache, JobConte
                              {"mesh", mesh->id()},
                              {"meshName", source.name(*mesh)},
                              {"transform", tr->id()},
-                             {"matrix", matrix_json(ph.world(tr))},
+                             {"placementTransform", placement->id()},
+                             {"skinned", o.cid == 137},
+                             {"matrix", matrix_json(ph.world(placement))},
                              {"sockets", ph.sockets(*tr, requestedSockets)},
                              {"materialContextMesh", fallback ? baseContext : context},
                              {"sourceWeapon", fallback ? baseEntry.at("name")

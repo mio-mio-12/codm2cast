@@ -102,6 +102,20 @@ struct Studio {
     std::map<std::string,IconTexture> galleryTextures;
     J galleryTags = J::object();
     J savedExportNames = J::object();
+    std::map<std::string,J> weaponConfigurations;
+    void remember_configuration() {
+        if (!selected.is_null() && is_weapon_entry(selected) && !profile.is_null())
+            weaponConfigurations[selected.at("id")] = {{"profile",profile},{"choices",choices},{"overrides",overrides}};
+    }
+    J configured_batch_plan() {
+        remember_configuration();
+        auto plan = batchPlan;
+        for (auto &entry : plan["entries"]) {
+            auto at = weaponConfigurations.find(entry.at("id"));
+            if (at != weaponConfigurations.end()) entry["configuration"] = at->second;
+        }
+        return plan;
+    }
     J weaponReference=J::object();
     std::string weaponCategoryFilter,weaponFamilyFilter;
     bool storeOpen=false,batchPopup=false,batchSkipExisting=true,batchSkipUntextured=true;
@@ -236,7 +250,7 @@ struct Studio {
             selected = selectedClip = profile = companion = nullptr;
             preview.reset(); materials.reset(); animation.reset(); animationBounds.reset();
             poseCache = PreviewPoseCache{}; playing = false; uploadPending = true;
-            choices = overrides = J::object(); inheritedClips = J::array();
+            choices = overrides = J::object(); inheritedClips = J::array(); weaponConfigurations.clear();
             batchPlan = nullptr; batchEntries.clear(); knownIssues = J::object();
             modelFilterKey.clear(); clipFilterKey.clear(); partStateKey.clear(); familyMenuSize=SIZE_MAX;
             galleryIcons = J::object(); galleryReady = galleryBusy = false;
@@ -476,6 +490,7 @@ struct Studio {
                 };
     }
     void select(const J &row) {
+        remember_configuration();
         cancel_preview();
         revision++;
         depthSample=false;navigationPivot=center;
@@ -490,6 +505,9 @@ struct Studio {
         profile = nullptr; partStateKey.clear();
         choices = J::object();
         overrides = J::object();
+        if (auto at = weaponConfigurations.find(row.at("id")); at != weaponConfigurations.end()) {
+            profile = at->second.at("profile"); choices = at->second.at("choices"); overrides = at->second.at("overrides");
+        }
         overrideInputs.clear();
         preview.reset();
         materials.reset();
@@ -510,7 +528,7 @@ struct Studio {
         }
         exportWorld = row.value("perspective", perspective(row.at("name"))) == "world";
         if (!textOnly)
-            prepare(true);
+            prepare(profile.is_null());
     }
     void augment_inherited(int tab) {
         std::set<std::string> ids;
@@ -599,6 +617,7 @@ struct Studio {
     void prepare(bool discover = false) {
         if (selected.is_null())
             return;
+        remember_configuration();
         cancel_preview();
         uint64_t token = ++revision;
         auto entry = selected;
@@ -659,6 +678,7 @@ struct Studio {
                         return;
                     profile = currentProfile; partStateKey.clear();
                     choices = currentChoices;
+                    remember_configuration();
                 });
             }
             J parts = currentProfile.is_null()
@@ -1094,7 +1114,7 @@ void Studio::draw() {
     auto &io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(io.DisplaySize);
-    ImGui::Begin("codm2cast_v11", nullptr,
+    ImGui::Begin("codm2cast_v12", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoSavedSettings);
     if (ImGui::Checkbox("Text only", &textOnly)) {
@@ -1762,6 +1782,7 @@ void Studio::draw_batch() {
             ImGui::EndPopup();return;
         }
         ImGui::Text("%zu %s models",batchEntries.size(),batchSelected?"selected":"loaded");
+        if(batchTab==1) ImGui::TextWrapped("Uses each weapon's configured attachments. Weapons you have not configured use discovered defaults.");
         if(ImGui::Checkbox(batchTab==1?"Include matching viewmodels and worldmodels":batchTab==0?"Include corresponding viewhands":"Include corresponding player models",&batchPair))resolve_batch();
         observe("Batch pair models");
         ImGui::TextWrapped(batchTab==1?"Exports assembled models and textures using each weapon's default compatible part set. Optional animations include variant actions, base-weapon fallbacks and paired camera clips for viewmodels.":"Exports models and textures. Counterparts require an exact variant match; missing or ambiguous matches are reported.");
@@ -1795,7 +1816,7 @@ void Studio::draw_batch() {
             ExportRequest options;options.catalog=catalog;options.database=database;options.data=data;options.modelsDestination=pathof(modelsDestination);options.t6=false;
             options.omitUnresolved=omitUnresolved;
             options.allWeaponClips=batchTab==1 && batchAnimations;options.animationsDestination=pathof(animationsDestination);
-            auto plan=batchPlan;
+            auto plan=configured_batch_plan();
             run("Export assets",[this,options,plan,skip=batchSkipExisting,strict=batchSkipUntextured](JobContext &job){
                 auto report=export_selected_models(options,plan,skip,strict,&job);
                 post([this,report]{
@@ -2149,6 +2170,20 @@ J studio_checks(const fs::path &directory) {
     {Studio migrated(scratch);migrated.save();}
     require(!read_json(scratch / "studio.json").contains("t6"),"Removed rig preference persisted");
     report["sourceRigsOnly"] = true;
+    {
+        Studio app(scratch); app.textOnly=true;
+        J a={{"id","weapon:a"},{"name","MainWeapon_001_Example_1P"},{"category","Weapon"}};
+        J b={{"id","weapon:b"},{"name","MainWeapon_002_Other_1P"},{"category","Weapon"}};
+        app.select(a); app.profile={{"entryId","weapon:a"},{"slots",J::array()}};
+        app.choices={{"sto","stock:2"},{"mag",nullptr}}; app.overrides={{"surface","material:1"}};
+        app.select(b); app.profile={{"entryId","weapon:b"},{"slots",J::array()}}; app.choices={{"sto","stock:3"}};
+        app.select(a);
+        require(app.choices.at("sto")=="stock:2" && app.choices.at("mag").is_null() && app.overrides.at("surface")=="material:1", "Selection lost custom parts, explicit None, or material overrides");
+        app.batchPlan={{"entries",J::array({a,b})}};
+        auto plan=app.configured_batch_plan(); app.choices["sto"]="stock:4";
+        require(plan["entries"][0]["configuration"]["choices"]["sto"]=="stock:2" && plan["entries"][1]["configuration"]["choices"]["sto"]=="stock:3", "Queued batch did not retain independent configuration snapshots");
+        report["configuredWeaponSelectionAndBatch"] = true;
+    }
     {
         Studio app(scratch);
         app.textOnly = true;
@@ -2568,7 +2603,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
             glfwWindowHint(GLFW_FOCUSED, GLFW_FALSE);
         }
-        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v11", nullptr, nullptr);
+        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v12", nullptr, nullptr);
         require(app.window != nullptr, "Could not create OpenGL preview window");
         glfwMakeContextCurrent(app.window);
         glfwSwapInterval(viewportBench ? 0 : 1);
@@ -2777,11 +2812,9 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             write_json(smokeImage.parent_path() / (smokeImage.stem().string() + "-error.json"),
                        {{"error", e.what()}});
         else
-            MessageBoxA(nullptr, e.what(), "codm2cast_v11", MB_ICONERROR);
+            MessageBoxA(nullptr, e.what(), "codm2cast_v12", MB_ICONERROR);
         exitCode = 1;
     }
     CoUninitialize();
     return exitCode;
 }
-
-

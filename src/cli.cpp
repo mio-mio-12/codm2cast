@@ -134,6 +134,15 @@ int main(int argc, char **argv) {
             std::cout << report.at("controllers").size() << " controllers, "
                       << report.at("clips").size() << " declared clips, "
                       << report.at("errors").size() << " unresolved owners\n";
+        } else if (cmd == "renderer-info") {
+            require(argc == 5, "renderer-info <catalog> <renderer-id> <report-json>");
+            Source source(pathof(argv[2]), data); Hierarchy h(source);
+            auto renderer = renderer_info(source, source.object(argv[3]));
+            auto &root = h.root(*renderer.transform); auto mesh = decode_mesh(source,*renderer.mesh);
+            J bones=J::array(); std::set<uint32_t> weighted;
+            for(size_t v=0;v<mesh.joints.size();++v)for(int k=0;k<4;++k)if(mesh.weights[v][k]>0)weighted.insert(mesh.joints[v][k]);
+            for(size_t i=0;i<renderer.bones.size();++i){auto *b=renderer.bones[i]; bones.push_back({{"id",b->id()},{"name",h.name(*b)},{"world",matrix_json(h.world(b))},{"weighted",weighted.contains(uint32_t(i))}});}
+            write_json(pathof(argv[4]),{{"root",root.id()},{"rootName",h.name(root)},{"transform",renderer.transform->id()},{"mesh",renderer.mesh->id()},{"name",mesh.name},{"world",matrix_json(h.world(renderer.transform))},{"bones",bones},{"sockets",h.sockets(root,{"Mag_point","Sto_point","Bar_point"})}});
         } else if (cmd == "inspect") {
             require(argc == 5, "inspect <catalog> <asset-id> <json>");
             Source source(pathof(argv[2]), data);

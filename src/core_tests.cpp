@@ -419,6 +419,11 @@ int main(int argc, char **argv) {
                           row("cab:3", "Gun_M_Fire_camera", "a"),
                           row("cab:1", "Gun_M_Fire", "a"),
                           row("cab:5", "Gun_M_PickUp", "a")});
+      require(action_name("Gun_1P_M_WeaponChangeClip")=="reload" &&
+              action_name("Gun_1P_M_WeaponChangeClip_E")=="reload_empty" &&
+              action_name("Gun_1P_M_WeaponQuickChangeClip")=="reload_quick" &&
+              action_name("Gun_1P_M_UnAimingOn")=="ads_down" &&
+              action_name("Gun_1P_M_IdlePose")=="idle", "Alternate controller action names lost their standard equivalents");
       auto plan = plan_animation_exports(clips);
       std::reverse(clips.begin(), clips.end());
       require(plan == plan_animation_exports(clips),

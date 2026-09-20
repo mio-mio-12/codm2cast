@@ -605,16 +605,24 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
         renderers.push_back(std::move(r));
     }
     std::vector<std::pair<Renderer,std::string>> attachmentRenderers;
+    std::map<std::string,std::vector<Object*>> attachmentTargets;
+    if(!parts.empty())for(const auto &id:visitedTransforms) {
+        auto &t=source.object(id); h.world(&t); attachmentTargets[h.name(t)].push_back(&t);
+    }
     for (auto &p : parts) {
         auto &tr = source.object(p.at("transform"));
         auto &so = source.object(p.at("socket"));
         auto sw = h.world(&so);
         auto pw = h.world(&tr);
+        auto &anchor = source.object(p.value("placementTransform", tr.id()));
+        auto aw = h.world(&anchor);
         require(!source.ref(tr, source.tree(tr).at("m_Father")),
                 "Attachment transform must be an authored root");
-        require(p.value("manualPlacement", false) || p.value("socketPlacement", false) || matrix_error(sw, pw) < .0001,
+        require(p.value("manualPlacement", false) || p.value("socketPlacement", false) || matrix_error(sw, aw) < .0001,
                 "Attachment does not match socket: " + p.at("name").get<std::string>());
-        h.worlds[tr.id()] = sw;
+        // Skinned attachment prefab roots may be identity transforms while the
+        // mesh itself is authored at the socket. Align that mesh, not the root.
+        h.worlds[tr.id()] = sw * glm::inverse(aw) * pw;
         h.parents[tr.id()] = so.id();
         add(tr.id());
         std::set<std::string> partVisited;
@@ -635,9 +643,36 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
         };collect(tr);
     }
     deduplicate_weapon_supplements(source,entry,attachmentRenderers,supplementalEvidence);
+    J attachmentBindings=J::array();
+    std::map<std::string,Object*> grafted;
+    std::function<Object*(Object*)> graft=[&](Object *bone)->Object* {
+        if(auto at=grafted.find(bone->id());at!=grafted.end())return at->second;
+        auto world=h.world(bone); std::vector<Object*> matches;
+        for(auto *target:attachmentTargets[h.name(*bone)])
+            if(matrix_error(h.world(target),world)<.0001)matches.push_back(target);
+        require(matches.size()<=1,"Ambiguous skinned attachment bone: "+h.name(*bone));
+        if(matches.size()==1) {
+            grafted[bone->id()]=matches[0];
+            attachmentBindings.push_back({{"source",bone->id()},{"target",matches[0]->id()},{"name",h.name(*bone)},{"evidence","Unique name and matching placed bind transform"}});
+            return matches[0];
+        }
+        grafted[bone->id()]=bone;
+        auto parent=h.parents.at(bone->id());
+        if(!parent.empty() && !visitedTransforms.contains(parent)) {
+            auto *mapped=graft(h.objects.at(parent));
+            h.parents[bone->id()]=mapped->id();
+        }
+        return bone;
+    };
     for(auto &[renderer,context]:attachmentRenderers) {
         if(renderer.bones.empty())add(renderer.transform->id());
-        else for(auto *bone:renderer.bones){h.world(bone);add(bone->id());}
+        else {
+            auto mesh=decode_mesh(source,*renderer.mesh); std::set<uint32_t> weighted;
+            for(size_t v=0;v<mesh.weights.size();++v)for(int k=0;k<4;++k)if(mesh.weights[v][k]>0)weighted.insert(mesh.joints[v][k]);
+            require(!weighted.empty(),"Skinned attachment has no weighted bones");
+            for(auto i:weighted){require(i<renderer.bones.size(),"Skinned attachment has invalid bone index");renderer.bones[i]=graft(renderer.bones[i]);add(renderer.bones[i]->id());}
+            for(size_t i=0;i<renderer.bones.size();++i)if(!weighted.contains(uint32_t(i)))renderer.bones[i]=renderer.bones[*weighted.begin()];
+        }
     }
     auto conv = native_basis();
     std::map<std::string, int> names;
@@ -836,6 +871,7 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
     model.report["renamedDuplicateBones"] = renamedBones;
     model.report["omittedCollisionHelpers"] = omitted;
     model.report["supplementalGeometry"]=supplementalEvidence;
+    model.report["skinnedAttachmentBindings"]=attachmentBindings;
     for(const auto &item:supplementalEvidence)if(item.at("status")=="unmatched")model.report["assemblyWarnings"].push_back(item);
     if (!bindAliases.empty())
         model.report["sourceBindAliases"] = bindAliases;

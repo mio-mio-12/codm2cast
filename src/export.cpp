@@ -276,6 +276,9 @@ static J export_assets_impl(const ExportRequest &r, JobContext *job) {
                 missing.push_back(action);
     report["baselineApplicable"] = baselineApplicable;
     report["missingBaselineActions"] = missing;
+    if (r.allWeaponClips && !missing.empty())
+        report["incompleteReasons"].push_back({{"reason","Weapon animation set is missing baseline actions"},{"actions",missing},
+            {"sourceEvidence",animationSources.value("unavailableActions",J::array())}});
     report["exportedAnimations"] = published.size();
     report["reusedAnimations"] = std::count_if(report["clips"].begin(), report["clips"].end(),
         [](const J &clip) { return clip.value("status", std::string()) == "existing"; });

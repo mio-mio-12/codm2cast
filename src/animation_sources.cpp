@@ -191,6 +191,20 @@ J weapon_animation_set(Source &source, const fs::path &database, const J &entry,
         evidence["baseDeclarations"] = std::move(baseDeclarations);
     }
     evidence["added"] = J::array();
+    evidence["unavailableActions"] = J::array();
+    std::set<std::string> supplied;
+    for (const auto &clip : combined) supplied.insert(action_name(clip.at("name")));
+    for (const auto &clip : evidence.at("declarations").at("clips")) {
+        auto action=action_name(clip.at("name"));
+        if (supplied.contains(action) || (action!="fire" && action!="ads_fire")) continue;
+        if (!lower(clip.at("name")).starts_with("empty_")) continue;
+        try {
+            auto decoded=decode_clip(source,source.object(clip.at("id")),job);
+            if (decoded.frames==0 && decoded.columns==0)
+                evidence["unavailableActions"].push_back({{"action",action},{"source",clip.at("id")},{"name",clip.at("name")},
+                    {"reason","Assigned controller slot contains an empty placeholder (zero frames and curves); no authored motion to export"}});
+        } catch(const std::exception &e) { if(job)job->check(); evidence["unavailableActions"].push_back({{"action",action},{"source",clip.at("id")},{"reason",e.what()}}); }
+    }
     for (const auto &clip : combined)
         if (clip.contains("inheritance"))
             evidence["added"].push_back(clip.at("id"));
