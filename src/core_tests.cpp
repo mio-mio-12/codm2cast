@@ -392,6 +392,7 @@ int main(int argc, char **argv) {
                      clip("cab:6", "MainWeapon_001_Example_1P_M_Equip"),
                      clip("cab:7", "MainWeapon_009_Other_1P_M_Equip")})}};
       J report;
+      declarations["clips"][3]["controllerReferences"][0]["overridden"] = false;
       auto unchanged = clip("cab:8", "MainWeapon_009_Other_1P_M_Inspection");
       unchanged["controllerReferences"][0]["original"] = "cab:8";
       declarations["clips"].push_back(unchanged);
@@ -409,6 +410,45 @@ int main(int argc, char **argv) {
       weapon.erase("declaredAnimationIDs");
       require(animation_match(weapon, combined[1]) == AnimationMatch::Unmatched,
               "A similar name fabricated an inheritance relationship");
+      auto shared = clip("shared:1", "ADV1P_MW2_M_Sprint", "Viewhands");
+      auto unassigned = clip("shared:2", "ADV1P_MW_M_Walk", "Viewhands");
+      unassigned["controllerReferences"][0]["overridden"] = false;
+      declarations["clips"].push_back(shared);
+      declarations["clips"].push_back(unassigned);
+      declarations["clips"].push_back(
+          clip("shared:3", "ADV3P_MW_M_Jump", "Player"));
+      combined = inherit_animation_sources(weapon, exact, declarations, &report);
+      require(combined.size() == 3 && report["added"].size() == 2 &&
+                  std::any_of(combined.begin(), combined.end(), [](const J &row) {
+                    return row.at("id") == "shared:1" &&
+                           row.at("category") == "Weapon" &&
+                           row.at("sourceCategory") == "Viewhands";
+                  }),
+              "Explicit advanced first-person replacement was excluded, or "
+              "an unassigned/wrong-perspective shared clip was accepted");
+      auto world = weapon;
+      world["name"] = "MainWeapon_002_ExampleSkin_3P";
+      auto worldClips = inherit_animation_sources(world, J::array(),
+          {{"clips", J::array({shared, unassigned})}});
+      require(worldClips.empty(), "First-person shared motion leaked into a worldmodel set");
+      auto olderHands = clip("shared:4", "AR_1p_RhandGasGrenade_Sniper", "Viewhands");
+      auto namelessPerspective = clip("shared:5", "MainWeapon_223_ExampleDouble_Fire");
+      namelessPerspective["controllerReferences"][0]["originalName"] = "Empty_MainWeapon_M_Fire";
+      auto thirdPerson = clip("shared:6", "ADV3P_MW_M_Jump", "Player");
+      auto ui = clip("shared:7", "MainWeapon_001_Example_UI_M_Inspection");
+      auto legacy = inherit_animation_sources(weapon, J::array(),
+          {{"clips", J::array({olderHands, namelessPerspective, thirdPerson, ui})}});
+      require(legacy.size() == 2, "Legacy controller replacements were lost or wrong-perspective clips admitted");
+      auto planned = plan_animation_exports(legacy);
+      require(std::any_of(planned.begin(), planned.end(), [](const J &row) {
+          return row.at("id") == "shared:5" && row.at("action") == "fire" &&
+                 row.at("name") == "MainWeapon_223_ExampleDouble_Fire";
+      }), "Controller role failed to name an unmarked firing clip without changing its source name");
+      require(action_name("AR_1p_RhandGasGrenade_Sniper") == "rhand_gas_grenade_sniper",
+              "Lowercase perspective marker leaked into exported action name");
+      auto third = inherit_animation_sources(world, J::array(), {{"clips", J::array({thirdPerson})}});
+      require(third.size()==1 && third[0]["sourceCategory"]=="Player" && third[0]["category"]=="Weapon",
+              "Explicit third-person shared controller replacement was lost");
     }
     {
       auto row = [](const char *id, const char *name, const char *bundle) {

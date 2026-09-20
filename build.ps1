@@ -1,4 +1,4 @@
-param([string] $Target = 'all', [string] $StudioOutputName = 'codm2cast_v12')
+param([string] $Target = 'all', [string] $StudioOutputName = 'codm2cast_v14')
 $ErrorActionPreference = 'Stop'
 $buildTemp = Join-Path $PSScriptRoot 'work\temp'
 New-Item -ItemType Directory -Force -Path $buildTemp | Out-Null
@@ -29,4 +29,3 @@ $buildArguments = @('--build', "$PSScriptRoot\work\build", '--config', 'Release'
 if ($Target -ne 'all') { $buildArguments += @('--target', $Target) }
 Invoke-BuildTool $buildArguments
 Invoke-BuildTool @('-E', 'chdir', "$PSScriptRoot\work\build", "$studio\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe", '-C', 'Release', '--output-on-failure')
-

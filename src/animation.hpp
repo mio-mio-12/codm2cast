@@ -46,6 +46,7 @@ std::vector<M4> sample_palette(const Model &model, const Animation &anim, double
 std::array<DV3, 2> animation_preview_bounds(const Model &model, const Animation &anim,
                                             JobContext *job = nullptr);
 std::string action_name(const std::string &sourceName);
+std::string animation_action(const J &clip);
 std::string camera_base_name(const std::string &sourceName);
 J applicable_animations(const Model &model, const std::vector<J> &rows);
 } // namespace codm

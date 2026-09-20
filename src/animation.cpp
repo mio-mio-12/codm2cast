@@ -686,14 +686,21 @@ std::string camera_base_name(const std::string &sourceName) {
     std::smatch match;if(!std::regex_search(sourceName,match,suffix))return {};
     return sourceName.substr(0,size_t(match.position()))+(match[1].matched?match[1].str():std::string());
 }
+std::string animation_action(const J &clip) {
+    return clip.value("controllerAction", action_name(clip.at("name")));
+}
 std::string action_name(const std::string &sourceName) {
     if(auto base=camera_base_name(sourceName);!base.empty())return action_name(base)+"_camera";
     std::string s = sourceName;
-    auto at = s.find("_M_");
+    auto at = lower(s).find("_m_");
     if (at != s.npos)
         s = s.substr(at + 3);
-    else if ((at = s.find("_1P_")) != s.npos)
-        s = s.substr(at + 4);
+    else {
+        std::smatch perspective;
+        static const std::regex marker("(^|_)(?:adv|advance)?(1p|3p|pov)_", std::regex::icase);
+        if (std::regex_search(s, perspective, marker))
+            s = s.substr(size_t(perspective.position() + perspective.length()));
+    }
     bool camera = false;
     for (auto suffix : {std::string("_camera"), std::string("_camra")})
         if (lower(s).ends_with(suffix)) {

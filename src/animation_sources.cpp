@@ -1,6 +1,7 @@
 #include "animation.hpp"
 #include "library.hpp"
 #include "materials.hpp"
+#include <regex>
 
 namespace codm {
 namespace {
@@ -144,13 +145,13 @@ J fill_base_animation_slots(const J &selected, const J &baseClips, const J &base
     J result = selected;
     std::set<std::string> occupied, ids;
     for (const auto &clip : selected) {
-        occupied.insert(action_name(clip.at("name")));
+        occupied.insert(animation_action(clip));
         ids.insert(clip.at("id"));
     }
     // Keep all distinct base clips for a missing action. Filename planning
     // already preserves duplicate source actions and their camera partners.
     for (auto clip : baseClips) {
-        auto action = action_name(clip.at("name"));
+        auto action = animation_action(clip);
         if (occupied.contains(action) || !ids.insert(clip.at("id")).second)
             continue;
         clip["inheritance"] = "Missing variant action supplied by the base weapon";
@@ -193,16 +194,17 @@ J weapon_animation_set(Source &source, const fs::path &database, const J &entry,
     evidence["added"] = J::array();
     evidence["unavailableActions"] = J::array();
     std::set<std::string> supplied;
-    for (const auto &clip : combined) supplied.insert(action_name(clip.at("name")));
+    for (const auto &clip : combined) supplied.insert(animation_action(clip));
     for (const auto &clip : evidence.at("declarations").at("clips")) {
-        auto action=action_name(clip.at("name"));
+        auto action=animation_action(clip);
         if (supplied.contains(action) || (action!="fire" && action!="ads_fire")) continue;
         if (!lower(clip.at("name")).starts_with("empty_")) continue;
         try {
             auto decoded=decode_clip(source,source.object(clip.at("id")),job);
             if (decoded.frames==0 && decoded.columns==0)
                 evidence["unavailableActions"].push_back({{"action",action},{"source",clip.at("id")},{"name",clip.at("name")},
-                    {"reason","Assigned controller slot contains an empty placeholder (zero frames and curves); no authored motion to export"}});
+                    {"scope","Assigned Animator slot only"},
+                    {"reason","Assigned controller slot contains an empty placeholder (zero frames and curves). Other motion sources are not resolved by this check."}});
         } catch(const std::exception &e) { if(job)job->check(); evidence["unavailableActions"].push_back({{"action",action},{"source",clip.at("id")},{"reason",e.what()}}); }
     }
     for (const auto &clip : combined)
@@ -220,11 +222,10 @@ J inherit_animation_sources(const J &entry, const J &selected, const J &declarat
     std::set<std::string> ids, actions;
     for (const auto &clip : selected) {
         ids.insert(clip.at("id"));
-        actions.insert(action_name(clip.at("name")));
+        actions.insert(animation_action(clip));
     }
     std::map<std::string, std::vector<J>> byAction;
     for (auto clip : declarations.at("clips")) {
-        auto identity = weapon_identity(clip.at("name"));
         auto id = clip.at("id").get<std::string>();
         if (ids.contains(id))
             continue;
@@ -238,11 +239,40 @@ J inherit_animation_sources(const J &entry, const J &selected, const J &declarat
                  {"reason", "Unchanged generic controller slot; reachability not established"}});
             continue;
         }
-        if (clip.at("category") != "Weapon" || !identity || identity->second != target.second) {
+        // Controller replacements establish ownership even for older AR/Pistol
+        // hand clips and weapon clips without a perspective suffix. Explicit
+        // opposite-perspective names remain excluded; bindings are still
+        // validated against the target skeleton during preview/export.
+        const auto name = lower(clip.at("name").get<std::string>());
+        std::smatch perspectiveMatch;
+        static const std::regex perspectiveToken("(^|_)(?:adv|advance)?(1p|3p|pov|ui)(_|$)");
+        std::string clipPerspective;
+        if (std::regex_search(name, perspectiveMatch, perspectiveToken))
+            clipPerspective = perspectiveMatch[2] == "pov" ? "1p" : perspectiveMatch[2].str();
+        const bool sharedMotion =
+            (target.second == "1p" && clip.at("category") == "Viewhands" && clipPerspective == "1p") ||
+            (target.second == "3p" && clip.at("category") == "Player" && clipPerspective == "3p");
+        if (!sharedMotion &&
+            (clip.at("category") != "Weapon" ||
+             (!clipPerspective.empty() && clipPerspective != target.second))) {
             skipped.push_back({{"source", id}, {"reason", "Different target category or perspective"}});
             continue;
         }
-        auto action = action_name(clip.at("name"));
+        // Some source names omit both the perspective and _M_ action boundary.
+        // Use a unique declared slot role instead of inventing a split inside
+        // the weapon/variant name. Preserve the actual source name and id.
+        if (name.find("_m_") == std::string::npos && clipPerspective.empty()) {
+            std::set<std::string> roles;
+            for (const auto &reference : clip.value("controllerReferences", J::array())) {
+                const auto original = reference.value("originalName", std::string());
+                if (reference.value("overridden", false) &&
+                    reference.value("original", std::string()) != id &&
+                    lower(original).find("_m_") != std::string::npos)
+                    roles.insert(action_name(original));
+            }
+            if (roles.size() == 1) clip["controllerAction"] = *roles.begin();
+        }
+        auto action = animation_action(clip);
         if (actions.contains(action)) {
             skipped.push_back(
                 {{"source", id}, {"reason", "Selected variant already supplies this action"}});
@@ -250,6 +280,10 @@ J inherit_animation_sources(const J &entry, const J &selected, const J &declarat
         }
         clip["inheritance"] =
             "Assigned override controller declares this clip for the selected hierarchy";
+        if (sharedMotion) {
+            clip["sourceCategory"] = clip.at("category");
+            clip["category"] = "Weapon"; // Contextual list; the global hand index stays unchanged.
+        }
         byAction[action].push_back(std::move(clip));
     }
     for (auto &[action, candidates] : byAction) {

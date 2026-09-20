@@ -116,6 +116,51 @@ int main(int argc, char **argv) {
                     write_json(pathof(argv[4]), {{"matches",matches},{"errors",errors},{"bundles",count},{"complete",false}});
             }
             write_json(pathof(argv[4]), {{"matches",matches},{"errors",errors},{"bundles",count},{"complete",true}});
+        } else if (cmd == "audit-weapon-animations") {
+            require(argc==4,"audit-weapon-animations <catalog> <report-jsonl>");
+            const auto database=pathof(argv[2]).parent_path()/"library.sqlite";
+            auto rows=library_rows(database,"model","Weapon");
+            std::erase_if(rows,[](const J &row){
+                const auto name=lower(row.value("name",std::string()));
+                const bool root=name.starts_with("mainweapon_") || name.starts_with("assiweapon_") ||
+                    name.starts_with("secondaryweapon_") || name.starts_with("pov_");
+                return !is_weapon_entry(row) || (!row.value("complete",false) && !root);
+            });
+            std::sort(rows.begin(),rows.end(),[](const J &a,const J &b){return a.at("bundle")<b.at("bundle");});
+            std::map<std::pair<std::string,std::string>,J> exact;
+            for(const auto &row:library_rows(database,"animation","Weapon"))
+                if(auto identity=weapon_identity(row.at("name"))) {
+                    if(!exact.contains(*identity))exact[*identity]=J::array();
+                    exact[*identity].push_back(row);
+                }
+            auto output=pathof(argv[3]);fs::create_directories(output.parent_path());
+            std::ofstream stream(output,std::ios::binary);require(bool(stream),"Cannot write audit report");
+            Source source(pathof(argv[2]),data);std::string previous;size_t count=0;
+            std::cout<<"Auditing "<<rows.size()<<" weapon model root entries\n"<<std::flush;
+            for(const auto &row:rows) {
+                auto bundle=row.at("bundle").get<std::string>();
+                if(bundle!=previous){source.clear();previous=bundle;}
+                J report={{"id",row.at("id")},{"name",row.at("name")},{"bundle",bundle}};
+                try {
+                    auto declarations=discover_animation_sources(source,row);
+                    auto identity=*weapon_identity(row.at("name"));J evidence;
+                    auto inherited=inherit_animation_sources(row,exact.contains(identity)?exact.at(identity):J::array(),declarations,&evidence);
+                    report["controllers"]=J::array();
+                    for(const auto &controller:declarations.at("controllers"))
+                        report["controllers"].push_back({{"id",controller.at("id")},{"name",controller.at("name")},{"errors",controller.at("errors")}});
+                    report["errors"]=declarations.at("errors");report["skipped"]=evidence.at("skipped");
+                    report["added"]=J::array();report["replaced"]=J::array();
+                    for(const auto &clip:inherited)if(clip.contains("inheritance"))report["added"].push_back(clip);
+                    for(const auto &clip:declarations.at("clips")) {
+                        bool replaced=false;
+                        for(const auto &ref:clip.at("controllerReferences"))replaced|=ref.value("overridden",false)&&ref.at("original")!=clip.at("id");
+                        if(replaced)report["replaced"].push_back(clip);
+                    }
+                }catch(const std::exception &e){report["fatalError"]=e.what();}
+                stream<<report.dump()<<'\n';stream.flush();
+                if(++count%50==0)std::cout<<count<<"/"<<rows.size()<<" checked\n"<<std::flush;
+            }
+            std::cout<<count<<"/"<<rows.size()<<" checked; complete\n";
         } else if (cmd == "animation-set") {
             require(argc == 5, "animation-set <catalog> <entry-json> <report-json>");
             Source source(pathof(argv[2]), data);
@@ -134,6 +179,25 @@ int main(int argc, char **argv) {
             std::cout << report.at("controllers").size() << " controllers, "
                       << report.at("clips").size() << " declared clips, "
                       << report.at("errors").size() << " unresolved owners\n";
+        } else if (cmd == "audit-object") {
+            require(argc==5,"audit-object <catalog> <object-id> <report-json>");
+            Source source(pathof(argv[2]),data);auto &object=source.object(argv[3]);
+            J report={{"object",object.id()},{"class",object.cid},{"bundle",object.file->bundle},{"externals",object.file->externals},{"objects",J::array()},{"candidateReferences",J::array()}};
+            auto bytes=object.raw();auto output=pathof(argv[4]);fs::create_directories(output.parent_path());
+            std::ofstream binary(output.string()+".bin",std::ios::binary);binary.write(reinterpret_cast<const char*>(bytes.data()),bytes.size());binary.close();
+            for(auto &[pid,item]:object.file->objects)if(item.cid==1 || item.cid==49 || item.cid==74 || item.cid==91 || item.cid==95 || item.cid==111 || item.cid==114 || item.cid==221){
+                J row={{"id",item.id()},{"class",item.cid},{"size",item.size}};
+                try{row["name"]=source.name(item);}catch(const std::exception&){}
+                report["objects"].push_back(std::move(row));
+            }
+            for(size_t offset=0;offset+12<=bytes.size();offset+=4){
+                Reader r(bytes,object.file->big);r.seek(offset);auto fid=r.get<int32_t>();auto pid=r.get<int64_t>();
+                if(fid<0 || fid>int(object.file->externals.size()) || pid<=0 || pid>1000000)continue;
+                try{auto *target=source.ref(object,{{"m_FileID",fid},{"m_PathID",pid}});if(!target || (target->cid!=74 && target->cid!=91 && target->cid!=221 && target->cid!=114 && target->cid!=49))continue;
+                    J row={{"offset",offset},{"id",target->id()},{"class",target->cid}};try{row["name"]=source.name(*target);}catch(const std::exception&){}report["candidateReferences"].push_back(std::move(row));
+                }catch(const std::exception&){}
+            }
+            write_json(output,report);
         } else if (cmd == "renderer-info") {
             require(argc == 5, "renderer-info <catalog> <renderer-id> <report-json>");
             Source source(pathof(argv[2]), data); Hierarchy h(source);

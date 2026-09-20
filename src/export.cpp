@@ -104,7 +104,7 @@ static J export_assets_impl(const ExportRequest &r, JobContext *job) {
         for (auto action : {"pose", "idle"}) {
             std::set<std::string> candidates;
             for (auto &row : references)
-                if (action_name(row.at("name")) == action)
+                if (animation_action(row) == action)
                     candidates.insert(row.at("id").get<std::string>());
             require(candidates.size() <= 1, "Ambiguous reference pose for T6 hand sizing");
             if (!candidates.empty()) {

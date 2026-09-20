@@ -11,12 +11,12 @@ J plan_animation_exports(const J &clips) {
         auto [it, inserted] = unique.emplace(id, clip);
         require(inserted || it->second.at("name") == clip.at("name"),
                 "Conflicting names for animation source " + id);
-        firstEquip |= action_name(clip.at("name")) == "first_raise";
+        firstEquip |= animation_action(clip) == "first_raise";
     }
     J result = J::array();
     std::set<std::string> occupied;
     for (auto &[id, clip] : unique) {
-        auto sourceAction = action_name(clip.at("name"));
+        auto sourceAction = animation_action(clip);
         bool camera = sourceAction.ends_with("_camera");
         std::string action = sourceAction;
         auto base = camera ? action.substr(0, action.size() - 7) : action;
