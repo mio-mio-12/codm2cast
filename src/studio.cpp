@@ -1142,7 +1142,7 @@ void Studio::draw() {
     if (directoryPopup) { ImGui::OpenPopup("Choose CODM directory"); directoryPopup = false; }
     ImGui::SetNextWindowSize(ImVec2(600, 0), ImGuiCond_Appearing);
     if (ImGui::BeginPopupModal("Choose CODM directory", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::TextWrapped("Choose the CODM Chinese PC installation folder containing your game files. The folder is saved in settings.ini.");
+        ImGui::TextWrapped("Choose the CODM PC installation folder containing your game files. The folder is saved in settings.ini.");
         ImGui::SetNextItemWidth(470);
         ImGui::InputText("##codmDirectory", &directoryDraft); observe("CODM directory input");
         ImGui::SameLine();
