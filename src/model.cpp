@@ -577,6 +577,7 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
     }
     std::set<std::string> visitedTransforms;
     std::set<std::string> retainedAvatarPaths;
+    std::map<std::string,Object*> authoredAvatarTargets;
     std::function<void(Object &, std::string)> retain = [&](Object &t, std::string path) {
         require(visitedTransforms.insert(t.id()).second && visitedTransforms.size() < 100000,
                 "Cyclic or excessive attachment hierarchy");
@@ -584,9 +585,11 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
         if (avatarPaths.contains(path) || name.find("point") != name.npos) {
             h.world(&t);
             add(t.id());
-            if (avatarPaths.contains(path))
+            if (avatarPaths.contains(path)) {
                 require(retainedAvatarPaths.insert(path).second,
                         "Duplicate Avatar transform path: " + path);
+                authoredAvatarTargets[path] = &t;
+            }
         }
         for (auto &p : source.tree(t).at("m_Children")) {
             auto child = source.ref(t, p);
@@ -606,11 +609,13 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
     }
     std::vector<std::pair<Renderer,std::string>> attachmentRenderers;
     std::map<std::string,std::vector<Object*>> attachmentTargets;
+    std::set<std::string> attachmentRoots;
     if(!parts.empty())for(const auto &id:visitedTransforms) {
         auto &t=source.object(id); h.world(&t); attachmentTargets[h.name(t)].push_back(&t);
     }
     for (auto &p : parts) {
         auto &tr = source.object(p.at("transform"));
+        attachmentRoots.insert(tr.id());
         auto &so = source.object(p.at("socket"));
         auto sw = h.world(&so);
         auto pw = h.world(&tr);
@@ -643,17 +648,42 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
         };collect(tr);
     }
     deduplicate_weapon_supplements(source,entry,attachmentRenderers,supplementalEvidence);
-    J attachmentBindings=J::array();
+    J attachmentBindings=J::array(), attachmentPathCandidates=J::array();
     std::map<std::string,Object*> grafted;
     std::function<Object*(Object*)> graft=[&](Object *bone)->Object* {
         if(auto at=grafted.find(bone->id());at!=grafted.end())return at->second;
         auto world=h.world(bone); std::vector<Object*> matches;
         for(auto *target:attachmentTargets[h.name(*bone)])
             if(matrix_error(h.world(target),world)<.0001)matches.push_back(target);
+        std::string matchEvidence = "Unique name and matching placed bind transform";
+        // Skinned parts may carry a copy of the weapon rig in a different bind
+        // pose. Match its complete prefab-relative path to the selected
+        // Animator Avatar, never a bare bone name or an arbitrary suffix.
+        // append() preserves a differing skin bind with a source-bind alias.
+        if(matches.empty() && !visitedTransforms.contains(bone->id())) {
+            std::vector<std::string> chain;
+            auto current=bone->id();
+            std::set<std::string> seen;
+            while(!current.empty() && !attachmentRoots.contains(current)) {
+                require(seen.insert(current).second,"Cyclic attachment bone ancestry");
+                const auto parent=h.parents.at(current);
+                if(parent.empty())break;
+                chain.push_back(h.name(*h.objects.at(current)));
+                current=parent;
+            }
+            std::reverse(chain.begin(),chain.end());
+            std::string path;
+            for(const auto &name:chain){if(!path.empty())path+='/';path+=name;}
+            attachmentPathCandidates.push_back({{"bone",bone->id()},{"name",h.name(*bone)},{"path",path}});
+            if(chain.size()>=2 && attachmentRoots.contains(current) && authoredAvatarTargets.contains(path)) {
+                matches.push_back(authoredAvatarTargets.at(path));
+                matchEvidence="Exact prefab-relative bone path in selected Animator Avatar";
+            }
+        }
         require(matches.size()<=1,"Ambiguous skinned attachment bone: "+h.name(*bone));
         if(matches.size()==1) {
             grafted[bone->id()]=matches[0];
-            attachmentBindings.push_back({{"source",bone->id()},{"target",matches[0]->id()},{"name",h.name(*bone)},{"evidence","Unique name and matching placed bind transform"}});
+            attachmentBindings.push_back({{"source",bone->id()},{"target",matches[0]->id()},{"name",h.name(*bone)},{"evidence",matchEvidence}});
             return matches[0];
         }
         grafted[bone->id()]=bone;
@@ -871,6 +901,7 @@ Model prepare_geometry(Source &source, const J &entry, const J &parts, JobContex
     model.report["renamedDuplicateBones"] = renamedBones;
     model.report["omittedCollisionHelpers"] = omitted;
     model.report["supplementalGeometry"]=supplementalEvidence;
+    model.report["attachmentPathCandidates"]=attachmentPathCandidates;
     model.report["skinnedAttachmentBindings"]=attachmentBindings;
     for(const auto &item:supplementalEvidence)if(item.at("status")=="unmatched")model.report["assemblyWarnings"].push_back(item);
     if (!bindAliases.empty())

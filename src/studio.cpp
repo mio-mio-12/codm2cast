@@ -1114,7 +1114,7 @@ void Studio::draw() {
     auto &io = ImGui::GetIO();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(io.DisplaySize);
-    ImGui::Begin("codm2cast_v14", nullptr,
+    ImGui::Begin("codm2cast_v15", nullptr,
                  ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoSavedSettings);
     if (ImGui::Checkbox("Text only", &textOnly)) {
@@ -2603,7 +2603,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
             glfwWindowHint(GLFW_FOCUSED, GLFW_FALSE);
         }
-        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v14", nullptr, nullptr);
+        app.window = glfwCreateWindow(1600, 1000, "codm2cast_v15", nullptr, nullptr);
         require(app.window != nullptr, "Could not create OpenGL preview window");
         glfwMakeContextCurrent(app.window);
         glfwSwapInterval(viewportBench ? 0 : 1);
@@ -2812,7 +2812,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             write_json(smokeImage.parent_path() / (smokeImage.stem().string() + "-error.json"),
                        {{"error", e.what()}});
         else
-            MessageBoxA(nullptr, e.what(), "codm2cast_v14", MB_ICONERROR);
+            MessageBoxA(nullptr, e.what(), "codm2cast_v15", MB_ICONERROR);
         exitCode = 1;
     }
     CoUninitialize();
